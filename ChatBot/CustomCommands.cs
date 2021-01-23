@@ -26,7 +26,7 @@ namespace ChatBot
                 typeof(CustomCommands),
                 new InputGestureCollection()
                 {
-                    new KeyGesture(Key.S, ModifierKeys.Control)
+                    new KeyGesture(Key.G, ModifierKeys.Control)
                 }
             );
         public static readonly RoutedUICommand Settings = new RoutedUICommand
@@ -57,6 +57,16 @@ namespace ChatBot
             new InputGestureCollection()
             {
                 new KeyGesture(Key.S, ModifierKeys.Control)
+            }
+        );
+        public static readonly RoutedUICommand Send = new RoutedUICommand
+        (
+            "Send",
+            "Send",
+            typeof(CustomCommands),
+            new InputGestureCollection()
+            {
+                new KeyGesture(Key.E, ModifierKeys.Control)
             }
         );
     }

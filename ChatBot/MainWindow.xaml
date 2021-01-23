@@ -29,15 +29,66 @@
                         Executed="ExitCommand_Executed"
                         CanExecute="ExitCommand_CanExecute"
                         x:Name="ExitCommand" />
+        <CommandBinding Command="local:CustomCommands.Send"
+                        Executed="SendCommand_Executed"
+                        CanExecute="SendCommand_CanExecute"
+                        x:Name="SendCommand" />
     </Window.CommandBindings>
-    
+
     <Window.Resources>
+        <local:AvatarConverter x:Key="avatarConverter" />
+
         <Style TargetType="Image">
             <Setter Property="Height"
                     Value="25" />
             <Setter Property="Margin"
                     Value="2" />
         </Style>
+
+        <Style TargetType="TextBlock" x:Key="textStyle">
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+            <Setter Property="FontSize"
+                    Value="14" />
+        </Style>
+
+        <Style TargetType="Border" x:Key="borderMessage">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding sender}"
+                             Value="User">
+                    <Setter Property="Background"
+                            Value="LightGreen" />
+                    <Setter Property="HorizontalAlignment"
+                            Value="Left" />
+                    <Setter Property="Margin"
+                            Value="10" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding sender}" Value="Bot">
+                    <Setter Property="Background"
+                            Value="Aqua" />
+                    <Setter Property="HorizontalAlignment"
+                            Value="Right" />
+                    <Setter Property="Margin"
+                            Value="10" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <DataTemplate DataType="{x:Type local:Message}">
+            <Border BorderBrush="Black" BorderThickness="2" CornerRadius="5" Padding="5" Style="{DynamicResource borderMessage}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding Path=Sender, Converter={StaticResource avatarConverter}}" VerticalAlignment="Center" Height="25"/>
+                        <TextBlock Style="{StaticResource textStyle}"
+                                   FontWeight="Bold"
+                                   Text="{Binding Sender}" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource textStyle}"
+                               TextWrapping="Wrap"
+                               Text="{Binding MessageText}" />
+                </StackPanel>
+            </Border>
+        </DataTemplate>
     </Window.Resources>
     
     <DockPanel>
@@ -102,17 +153,26 @@
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="35" />
             </Grid.ColumnDefinitions>
             <Border BorderThickness="2"
                     BorderBrush="Black"
-                    Grid.Column="0">
-                <TextBox Height="30" />
+                    Grid.Column="0"
+                    VerticalAlignment="Center">
+                <TextBox Height="30"
+                         x:Name="newMessageTextBox"
+                         VerticalAlignment="Center"
+                         FontSize="14" />
             </Border>
-            <Button Grid.Column="1" IsDefault="True">
+            <Button Grid.Column="1"
+                    IsDefault="True"
+                    Command="local:CustomCommands.Send"
+                    ToolTip="Enviar">
                 <Image Source="assets/send.png" />
             </Button>
         </Grid>
-        <ItemsControl Background="LightYellow"></ItemsControl>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding}" Background="LightYellow" x:Name="messagesItemsControl"></ItemsControl>
+        </ScrollViewer>
     </DockPanel>
 </Window>

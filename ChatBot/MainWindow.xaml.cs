@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,34 +18,52 @@ using System.Windows.Shapes;
 
 namespace ChatBot
 {
-    /// <summary>
-    /// Lógica de interacción para MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        ObservableCollection<Message> messages;
+
         public MainWindow()
         {
+            messages = new ObservableCollection<Message>();
             InitializeComponent();
+            messagesItemsControl.DataContext = messages;
         }
 
         private void NewChatCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-
+            if (messages.Count != 0)
+                e.CanExecute = true;
         }
 
         private void NewChatCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            messages = new ObservableCollection<Message>();
         }
 
         private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-
+            if (messages.Count != 0)
+                e.CanExecute = true;
         }
 
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Archivos de texto (*.txt)|*.txt";
+            sfd.ShowDialog();
+            string fileName = sfd.FileName;
+            if (string.IsNullOrEmpty(fileName))
+                MessageBox.Show("No se guardó la información", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+            {
+                StringBuilder data = new StringBuilder();
+                foreach (Message item in messages)
+                {
+                    data.Append(item.Sender + ":" + item.MessageText + "\n");
+                }
+                File.WriteAllText(fileName, data.ToString());
+                MessageBox.Show("Guardado correctamente", "Guardado", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void SettingsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -73,6 +94,19 @@ namespace ChatBot
         private void ExitCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
+        }
+
+        private void SendCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (newMessageTextBox.Text != "")
+                e.CanExecute = true;
+        }
+
+        private void SendCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            messages.Add(new Message(newMessageTextBox.Text, "User"));
+            messages.Add(new Message("Lo siento, estoy un poco cansado para hablar.", "Bot"));
+            newMessageTextBox.Text = "";
         }
     }
 }
